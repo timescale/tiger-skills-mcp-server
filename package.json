@@ -1,0 +1,42 @@
+{
+  "name": "@tigerdata/tiger-skills-mcp-server",
+  "version": "0.1.0",
+  "description": "MCP server to provide an agent with skills",
+  "license": "UNLICENSED",
+  "author": "TigerData",
+  "homepage": "https://tigerdata.com",
+  "type": "module",
+  "bin": {
+    "tiger-skills-mcp-server": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && shx chmod +x dist/*.js",
+    "prepare": "npm run build",
+    "watch": "tsc --watch",
+    "watch:http": "tsx watch src/index.ts http",
+    "start": "node dist/index.js stdio",
+    "start:http": "node dist/index.js http",
+    "inspector": "npx @modelcontextprotocol/inspector"
+  },
+  "dependencies": {
+    "@octokit/plugin-throttling": "^11.0.1",
+    "@octokit/rest": "^22.0.1",
+    "@tigerdata/mcp-boilerplate": "^0.4.0",
+    "@toon-format/toon": "^0.8.0",
+    "dotenv": "^17.2.0",
+    "gray-matter": "^4.0.3",
+    "yaml": "^2.8.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.16.4",
+    "ai": "^5.0.17",
+    "prettier": "^3.6.2",
+    "shx": "^0.4.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.8.3"
+  }
+}

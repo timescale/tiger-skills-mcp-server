@@ -1,0 +1,6 @@
+.github/
+chart/
+dist/
+node_modules/
+skills/
+skills.yaml

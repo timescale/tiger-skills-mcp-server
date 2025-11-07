@@ -1,0 +1,8 @@
+---
+claude-cookbooks:
+  type: github_collection
+  repo: anthropics/claude-cookbooks
+  path: ./skills/custom_skills
+local: 
+  type: local_collection
+  path: ./skills

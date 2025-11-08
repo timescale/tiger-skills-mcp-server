@@ -1,10 +1,7 @@
 import { ApiFactory } from '@tigerdata/mcp-boilerplate';
 import { z } from 'zod';
-import path from 'path';
 import { ServerContext } from '../types.js';
-import { loadSkills, resolveSkill } from '../util/skills.js';
-import { readdir, readFile, stat } from 'fs/promises';
-import { encode } from '@toon-format/toon';
+import { listSkills, viewSkillContent } from '../util/skills.js';
 
 const inputSchema = {
   skill_name: z
@@ -50,83 +47,12 @@ If you need to explore other files or directories within the skill, specify the 
   },
   fn: async ({ skill_name, path: passedPath }) => {
     if (!skill_name || skill_name === '.') {
-      const skills = await loadSkills(octokit);
       return {
-        content: `<available_skills>
-${encode(
-  [...skills.values()].map((s) => ({
-    name: s.name,
-    description: s.description,
-  })),
-  { delimiter: '\t' },
-)}
-</available_skills>`,
+        content: await listSkills(octokit),
       };
     }
-    const skill = await resolveSkill(octokit, skill_name);
-    if (!skill) {
-      throw new Error(`Skill not found: ${skill_name}`);
-    }
-
-    switch (skill.type) {
-      case 'local': {
-        const target = path.join(skill.path, passedPath || 'SKILL.md');
-        const s = await stat(target);
-        if (s.isDirectory()) {
-          const entries = await readdir(target, {
-            withFileTypes: true,
-          });
-          const listing = entries
-            .map((entry) => {
-              return `${entry.isDirectory() ? '📁' : '📄'} ${entry.name}`;
-            })
-            .join('\n');
-          return {
-            content: listing,
-          };
-        } else if (s.isFile()) {
-          const fileContent = await readFile(target, 'utf-8');
-          return {
-            content: fileContent,
-          };
-        } else {
-          throw new Error(`Unsupported file type at path: ${target}`);
-        }
-      }
-      case 'github': {
-        const [owner, repo] = skill.repo.split('/');
-        const target = `${skill.path || '.'}/${passedPath || 'SKILL.md'}`
-          .replace(/\/+/g, '/')
-          .replace(/(^\.?\/+)|(^\.$)|(\/\.$)/g, '');
-        const response = await octokit.repos.getContent({
-          owner,
-          repo,
-          path: target,
-        });
-        if (Array.isArray(response.data)) {
-          // Directory listing
-          const listing = response.data
-            .map((entry) => {
-              return `${entry.type === 'dir' ? '📁' : '📄'} ${entry.name}`;
-            })
-            .join('\n');
-          return {
-            content: `Directory listing for ${skill_name}/${passedPath}:\n${listing}`,
-          };
-        }
-        if (response.data.type !== 'file') {
-          throw new Error(`Unsupported content type: ${response.data.type}`);
-        }
-        return {
-          content: Buffer.from(response.data.content, 'base64').toString(
-            'utf-8',
-          ),
-        };
-      }
-      default: {
-        // @ts-expect-error exhaustive check
-        throw new Error(`Unhandled skill type: ${skill.type}`);
-      }
-    }
+    return {
+      content: await viewSkillContent(octokit, skill_name, passedPath),
+    };
   },
 });

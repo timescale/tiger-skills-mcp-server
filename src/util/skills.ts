@@ -9,10 +9,12 @@ import {
   zSkillCfgMap,
   zSkillMatter,
 } from '../types.js';
-import { readdir, readFile } from 'fs/promises';
+import { readdir, readFile, stat } from 'fs/promises';
 import matter from 'gray-matter';
 import YAML from 'yaml';
 import { Octokit } from '@octokit/rest';
+import { encode } from '@toon-format/toon';
+import path from 'path';
 
 let skillCfgMap: SkillCfgMap | null = null;
 export const getSkillConfig = async (): Promise<SkillCfgMap> => {
@@ -196,7 +198,6 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
       }
     }
   }
-  console.log(skills);
   return skills;
 };
 
@@ -207,4 +208,80 @@ export const resolveSkill = async (
 ): Promise<Skill | null> => {
   const skills = await loadSkills(octokit, force);
   return skills.get(skillName) || null;
+};
+
+export const listSkills = async (
+  octokit: Octokit,
+  force = false,
+): Promise<string> => {
+  const skills = await loadSkills(octokit, force);
+  return `<available_skills>
+${encode(
+  [...skills.values()].map((s) => ({
+    name: s.name,
+    description: s.description,
+  })),
+  { delimiter: '\t' },
+)}
+</available_skills>`;
+};
+
+export const viewSkillContent = async (
+  octokit: Octokit,
+  name: string,
+  passedPath?: string,
+): Promise<string> => {
+  const skill = await resolveSkill(octokit, name);
+  if (!skill) {
+    throw new Error(`Skill not found: ${name}`);
+  }
+
+  switch (skill.type) {
+    case 'local': {
+      const target = path.join(skill.path, passedPath || 'SKILL.md');
+      const s = await stat(target);
+      if (s.isDirectory()) {
+        const entries = await readdir(target, {
+          withFileTypes: true,
+        });
+        return entries
+          .map((entry) => {
+            return `${entry.isDirectory() ? '📁' : '📄'} ${entry.name}`;
+          })
+          .join('\n');
+      } else if (s.isFile()) {
+        return await readFile(target, 'utf-8');
+      } else {
+        throw new Error(`Unsupported file type at path: ${target}`);
+      }
+    }
+    case 'github': {
+      const [owner, repo] = skill.repo.split('/');
+      const target = `${skill.path || '.'}/${passedPath || 'SKILL.md'}`
+        .replace(/\/+/g, '/')
+        .replace(/(^\.?\/+)|(^\.$)|(\/\.$)/g, '');
+      const response = await octokit.repos.getContent({
+        owner,
+        repo,
+        path: target,
+      });
+      if (Array.isArray(response.data)) {
+        // Directory listing
+        const listing = response.data
+          .map((entry) => {
+            return `${entry.type === 'dir' ? '📁' : '📄'} ${entry.name}`;
+          })
+          .join('\n');
+        return `Directory listing for ${name}/${passedPath}:\n${listing}`;
+      }
+      if (response.data.type !== 'file') {
+        throw new Error(`Unsupported content type: ${response.data.type}`);
+      }
+      return Buffer.from(response.data.content, 'base64').toString('utf-8');
+    }
+    default: {
+      // @ts-expect-error exhaustive check
+      throw new Error(`Unhandled skill type: ${skill.type}`);
+    }
+  }
 };

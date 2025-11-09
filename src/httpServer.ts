@@ -2,7 +2,11 @@
 import { httpServerFactory } from '@tigerdata/mcp-boilerplate';
 import { apiFactories } from './apis/index.js';
 import { context, serverInfo } from './serverInfo.js';
-import { listSkills, viewSkillContent } from './util/skills.js';
+import {
+  loadSkills,
+  skillsDescription,
+  viewSkillContent,
+} from './util/skills.js';
 import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 export const { registerCleanupFn } = httpServerFactory({
@@ -10,41 +14,34 @@ export const { registerCleanupFn } = httpServerFactory({
   context,
   apiFactories,
   stateful: false,
-  additionalSetup: async ({ context, server }) => {
+  additionalSetup: async ({ context: { octokit }, server }) => {
     server.registerResource(
       'skills',
-      'root://skills',
-      {
-        title: 'Skills',
-        description: 'The list of available skills.',
-      },
-      async (uri) => ({
-        contents: [
-          {
-            uri: uri.href,
-            text: await listSkills(context.octokit),
-          },
-        ],
-      }),
-    );
-
-    server.registerResource(
-      'skill',
-      new ResourceTemplate('skills://{skill_name}{?path}', {
-        list: undefined,
+      new ResourceTemplate('skills://{name}{?path}', {
+        list: async () => {
+          const skills = await loadSkills(octokit);
+          return {
+            resources: Array.from(skills.values()).map((skill) => ({
+              uri: `skills://${skill.name}?path=SKILL.md`,
+              name: skill.name,
+              title: skill.name,
+              description: skill.description,
+              mimeType: 'text/markdown',
+            })),
+          };
+        },
       }),
       {
         title: 'Skill',
-        description:
-          'View the content of a specific skill file or directory. Pass "." as the `path` to list the root content of a skill. The main skill document is located at the `path` "SKILL.md".',
+        description: skillsDescription,
       },
-      async (uri, { skill_name, path }) => ({
+      async (uri, { name, path }) => ({
         contents: [
           {
             uri: uri.href,
             text: await viewSkillContent(
-              context.octokit,
-              skill_name as string,
+              octokit,
+              name as string,
               path as string,
             ),
           },

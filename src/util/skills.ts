@@ -4,7 +4,6 @@ import {
   LocalSkill,
   Skill,
   SkillCfgMap,
-  SkillMap,
   SkillMatter,
   zSkillCfgMap,
   zSkillMatter,
@@ -285,3 +284,34 @@ export const viewSkillContent = async (
     }
   }
 };
+
+export const skillsDescription = `
+# Tiger Skills
+
+This tool provides access to domain-specific skills - structured knowledge and procedures for specialized tasks.
+
+## How to Use Skills
+
+1. **Discover**: If you have not been provided the list of skills, fetch them by invoking this tool with \`name: "."\`
+2. **Read**: Access a skill by reading its SKILL.md file: \`name: "skill-name", path: "SKILL.md"\`
+3. **Explore**: Navigate within the skill directory to find additional resources, examples, or templates.
+   The SKILL.md file and other documents may contain relative links to guide you.
+   You can list the content of directories by specifying the directory path, relative to the skill root.
+4. **Apply**: Follow the procedures and reference the knowledge in the skill to complete your task
+
+## Skill Structure
+
+Each skill contains:
+- **SKILL.md**: Main documentation (always start here)
+- **REFERENCE.md**: Quick reference card (optional)
+- Additional files: Examples, templates, scripts
+
+## When to Use Skills
+
+- Read relevant skills proactively when you identify a task that matches a skill's domain
+- Skills are meant to augment your knowledge, not replace your reasoning
+- Apply skill guidance while adapting to the specific user request
+- Skills use progressive disclosure - start with high-level guidance and drill down only as needed
+- Skills may also refer to tools or resources external to the skill itself
+- Use other tools to execute any code or scripts provided by the skill
+`.trim();

@@ -71,3 +71,8 @@ export interface ServerContext extends Record<string, unknown> {
   octokit: Octokit;
   org: string;
 }
+
+export interface SkillsFlags {
+  enabledSkills: Set<string> | null;
+  disabledSkills: Set<string> | null;
+}

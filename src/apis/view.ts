@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { ServerContext } from '../types.js';
 import {
   listSkills,
+  parseSkillsFlags,
   skillsDescription,
   viewSkillContent,
 } from '../util/skills.js';
@@ -30,7 +31,7 @@ export const view: ApiFactory<
   ServerContext,
   typeof inputSchema,
   typeof outputSchema
-> = ({ octokit, org }) => ({
+> = ({ octokit, org }, { query }) => ({
   name: 'view',
   method: 'get',
   route: '/view',
@@ -41,13 +42,14 @@ export const view: ApiFactory<
     outputSchema,
   },
   fn: async ({ skill_name, path: passedPath }) => {
+    const flags = parseSkillsFlags(query);
     if (!skill_name || skill_name === '.') {
       return {
-        content: await listSkills(octokit),
+        content: await listSkills(octokit, flags),
       };
     }
     return {
-      content: await viewSkillContent(octokit, skill_name, passedPath),
+      content: await viewSkillContent(octokit, flags, skill_name, passedPath),
     };
   },
 });

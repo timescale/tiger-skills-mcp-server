@@ -36,6 +36,19 @@ const parseSkillFile = async (
 }> => {
   const { data, content } = matter(fileContent);
   const skillMatter = zSkillMatter.parse(data);
+  if (!/^[a-zA-Z0-9-_]+$/.test(skillMatter.name)) {
+    const normalized = skillMatter.name
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-_]/g, '_')
+      .replace(/-[-_]+/g, '-')
+      .replace(/_[_-]+/g, '_')
+      .replace(/(^[-_]+)|([-_]+$)/g, '');
+    log.warn(
+      `Skill name "${skillMatter.name}" contains invalid characters. Normalizing to "${normalized}".`,
+    );
+    skillMatter.name = normalized;
+  }
   return {
     matter: skillMatter,
     content,
@@ -61,6 +74,22 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
   skillContentCache.clear();
   const skills = new Map<string, Skill>();
 
+  const alreadyExists = (
+    name: string,
+    path: string,
+    description: string,
+  ): boolean => {
+    const existing = skills.get(name);
+    if (existing) {
+      log.warn(
+        `Skill with name "${name}" already loaded from path "${existing.path}". Skipping duplicate at path "${path}".`,
+        { existing, duplicate: { path, name, description } },
+      );
+      return true;
+    }
+    return false;
+  };
+
   const loadLocalPath = async (path: string) => {
     const skillPath = `${path}/SKILL.md`;
     try {
@@ -69,14 +98,7 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
         matter: { name, description },
         content,
       } = await parseSkillFile(fileContent);
-      const existing = skills.get(name);
-      if (existing) {
-        log.warn(
-          `Skill with name "${name}" already loaded from path "${existing.path}". Skipping duplicate at path "${path}".`,
-          { existing, duplicate: { path, name, description } },
-        );
-        return;
-      }
+      if (alreadyExists(name, path, description)) return;
       skills.set(name, {
         type: 'local',
         path,
@@ -116,14 +138,7 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
         matter: { name, description },
         content,
       } = await parseSkillFile(fileContent);
-      const existing = skills.get(name);
-      if (existing) {
-        log.warn(
-          `Skill with name "${name}" already loaded from path "${existing.path}". Skipping duplicate at GitHub path "${path}".`,
-          { existing, duplicate: { path, name, description } },
-        );
-        return;
-      }
+      if (alreadyExists(name, path, description)) return;
       skills.set(name, {
         type: 'github',
         repo: `${owner}/${repo}`,
@@ -235,9 +250,15 @@ export const viewSkillContent = async (
     throw new Error(`Skill not found: ${name}`);
   }
 
+  const targetPath = passedPath || 'SKILL.md';
+  const cached = skillContentCache.get(`${name}/${targetPath}`);
+  if (cached) {
+    return cached;
+  }
+
   switch (skill.type) {
     case 'local': {
-      const target = path.join(skill.path, passedPath || 'SKILL.md');
+      const target = path.join(skill.path, targetPath);
       const s = await stat(target);
       if (s.isDirectory()) {
         const entries = await readdir(target, {
@@ -256,7 +277,7 @@ export const viewSkillContent = async (
     }
     case 'github': {
       const [owner, repo] = skill.repo.split('/');
-      const target = `${skill.path || '.'}/${passedPath || 'SKILL.md'}`
+      const target = `${skill.path || '.'}/${targetPath}`
         .replace(/\/+/g, '/')
         .replace(/(^\.?\/+)|(^\.$)|(\/\.$)/g, '');
       const response = await octokit.repos.getContent({

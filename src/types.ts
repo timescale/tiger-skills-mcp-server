@@ -50,7 +50,7 @@ export const zSkillCfgMap = z.record(zSkillCfg);
 export type SkillCfgMap = z.infer<typeof zSkillCfgMap>;
 
 export const zSkillMatter = z.object({
-  name: z.string(),
+  name: z.string().trim().min(1),
   description: z.string(),
 });
 export type SkillMatter = z.infer<typeof zSkillMatter>;

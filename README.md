@@ -118,6 +118,21 @@ skill-creator:
 
 Skill names must be unique across all configured skills. Any duplicates will be ignored with a warning.
 
+### Connection string parameters
+
+The MCP server accepts the following connection string parameters:
+
+- `enabled_skills`: Comma-separated list of skill keys to enable. If not provided, all configured skills are enabled.
+- `disabled_skills`: Comma-separated list of skill keys to disable. If not provided, no skills are disabled.
+- `tools=0`: Disable all tools (for resource-only integration).
+- `resources=0`: Disable all resources (for tool-only integration).
+
+#### Example
+
+```text
+http://tiger-skills-mcp-server/mcp?disabled_skills=foo,bar&resources=0
+```
+
 ## Development
 
 Cloning and running the server locally.

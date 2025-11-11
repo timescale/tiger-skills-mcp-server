@@ -2,6 +2,5 @@ dist
 node_modules
 .env
 .DS_Store
-skills/
 skills.yaml
 .claude/*.local.json

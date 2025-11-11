@@ -29,7 +29,7 @@ equipped with procedural knowledge that no model can fully possess.
 
 Every skill consists of a required SKILL.md file and optional bundled resources:
 
-```
+```text
 skill-name/
 ├── SKILL.md (required)
 │   ├── YAML frontmatter metadata (required)

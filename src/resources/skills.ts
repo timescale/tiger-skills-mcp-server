@@ -1,5 +1,4 @@
-import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { ResourceFactory } from '../../../mcp-boilerplate-node/dist/types.js';
+import { ResourceFactory } from '@tigerdata/mcp-boilerplate';
 import { ServerContext } from '../types.js';
 import {
   loadSkills,

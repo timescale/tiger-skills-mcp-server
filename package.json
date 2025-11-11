@@ -22,7 +22,6 @@
     "inspector": "npx @modelcontextprotocol/inspector"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.21.1",
     "@octokit/plugin-throttling": "^11.0.1",
     "@octokit/rest": "^22.0.1",
     "@tigerdata/mcp-boilerplate": "^0.5.0",

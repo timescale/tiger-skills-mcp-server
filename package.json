@@ -2,7 +2,7 @@
   "name": "@tigerdata/tiger-skills-mcp-server",
   "version": "0.1.0",
   "description": "MCP server to provide an agent with skills",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "author": "TigerData",
   "homepage": "https://tigerdata.com",
   "type": "module",

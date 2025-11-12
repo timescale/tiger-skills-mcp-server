@@ -160,7 +160,24 @@ Then update the `GITHUB_TOKEN` value in `.env`.
 The MCP Inspector is a very handy to exercise the MCP server from a web-based UI.
 
 ```bash
-npx @modelcontextprotocol/inspector
+npm run inspector
+```
+
+#### Test via HTTP
+
+```bash
+npm run watch
+```
+
+| Field          | Value                       |
+| -------------- | --------------------------- |
+| Transport Type | `Streamable HTTP`           |
+| URL            | `http://localhost:3001/mcp` |
+
+#### Test via stdio
+
+```bash
+npm run watch:stdio
 ```
 
 | Field          | Value           |

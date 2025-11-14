@@ -16,7 +16,20 @@ export const zLocalSkillCfg = z.object({
 });
 export type LocalSkillCfg = z.infer<typeof zLocalSkillCfg>;
 
-export const zLocalCollectionSkillCfg = z.object({
+const zCollectionFlags = z.object({
+  enabledSkills: z.array(z.string()).optional(),
+  disabledSkills: z.array(z.string()).optional(),
+  ignoredPaths: z.array(z.string()).optional(),
+});
+export type CollectionFlagsRaw = z.infer<typeof zCollectionFlags>;
+
+export interface CollectionFlags {
+  enabledSkills: Set<string> | null;
+  disabledSkills: Set<string> | null;
+  ignoredPaths: Set<string> | null;
+}
+
+export const zLocalCollectionSkillCfg = zCollectionFlags.extend({
   type: z.literal('local_collection'),
   path: z.string(),
 });
@@ -29,7 +42,7 @@ export const zGitHubSkillCfg = z.object({
 });
 export type GitHubSkillCfg = z.infer<typeof zGitHubSkillCfg>;
 
-export const zGitHubCollectionSkillCfg = z.object({
+export const zGitHubCollectionSkillCfg = zCollectionFlags.extend({
   type: z.literal('github_collection'),
   repo: z.string(),
   path: z.string().optional(),

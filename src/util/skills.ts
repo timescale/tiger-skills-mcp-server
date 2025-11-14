@@ -1,5 +1,7 @@
 import { log, McpFeatureFlags, ParsedQs } from '@tigerdata/mcp-boilerplate';
 import {
+  CollectionFlags,
+  CollectionFlagsRaw,
   GitHubSkill,
   LocalSkill,
   Skill,
@@ -14,7 +16,7 @@ import matter from 'gray-matter';
 import YAML from 'yaml';
 import { Octokit } from '@octokit/rest';
 import { encode } from '@toon-format/toon';
-import path from 'path';
+import Path from 'path';
 
 let skillCfgMap: SkillCfgMap | null = null;
 export const getSkillConfig = async (): Promise<SkillCfgMap> => {
@@ -94,7 +96,31 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
     return false;
   };
 
-  const loadLocalPath = async (path: string) => {
+  const shouldIgnorePath = (path: string, flags?: CollectionFlags): boolean => {
+    if (flags?.ignoredPaths && flags.ignoredPaths.has(path)) {
+      log.debug(`Ignoring path "${path}" in ignoredPaths`);
+      return true;
+    }
+    return false;
+  };
+
+  const shouldIgnoreSkill = (
+    name: string,
+    flags?: CollectionFlags,
+  ): boolean => {
+    if (flags?.enabledSkills && !flags.enabledSkills.has(name)) {
+      log.debug(`Ignoring skill "${name}" not in enabledSkills`);
+      return true;
+    }
+    if (flags?.disabledSkills && flags.disabledSkills.has(name)) {
+      log.debug(`Ignoring skill "${name}" in disabledSkills`);
+      return true;
+    }
+    return false;
+  };
+
+  const loadLocalPath = async (path: string, flags?: CollectionFlags) => {
+    if (shouldIgnorePath(path, flags)) return;
     const skillPath = `${path}/SKILL.md`;
     try {
       const fileContent = await readFile(skillPath, 'utf-8');
@@ -102,6 +128,7 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
         matter: { name, description },
         content,
       } = await parseSkillFile(fileContent);
+      if (shouldIgnoreSkill(name, flags)) return;
       if (alreadyExists(name, path, description)) return;
       skills.set(name, {
         type: 'local',
@@ -115,7 +142,13 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
     }
   };
 
-  const loadGitHubPath = async (owner: string, repo: string, path: string) => {
+  const loadGitHubPath = async (
+    owner: string,
+    repo: string,
+    path: string,
+    flags?: CollectionFlags,
+  ) => {
+    if (shouldIgnorePath(path, flags)) return;
     const skillPath = `${path}/SKILL.md`;
     try {
       const skillFileResponse = await octokit.repos.getContent({
@@ -142,6 +175,7 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
         matter: { name, description },
         content,
       } = await parseSkillFile(fileContent);
+      if (shouldIgnoreSkill(name, flags)) return;
       if (alreadyExists(name, path, description)) return;
       skills.set(name, {
         type: 'github',
@@ -158,68 +192,94 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
     }
   };
 
-  for (const [name, cfg] of Object.entries(skillCfgs)) {
-    try {
-      switch (cfg.type) {
-        case 'local': {
-          await loadLocalPath(cfg.path);
-          break;
-        }
-        case 'local_collection': {
-          const dirEntries = await readdir(cfg.path, { withFileTypes: true });
-          for (const entry of dirEntries) {
-            if (!entry.isDirectory()) continue;
-            await loadLocalPath(`${cfg.path}/${entry.name}`);
+  const promises: Promise<void>[] = [];
+  await Promise.all(
+    Object.entries(skillCfgs).map(async ([name, cfg]) => {
+      try {
+        switch (cfg.type) {
+          case 'local': {
+            promises.push(loadLocalPath(cfg.path));
+            break;
           }
-          break;
-        }
-        case 'github': {
-          const [owner, repo] = cfg.repo.split('/');
-          await loadGitHubPath(owner, repo, cfg.path || '.');
-          break;
-        }
-        case 'github_collection': {
-          const [owner, repo] = cfg.repo.split('/');
-          const rootPath = cfg.path
-            ? cfg.path.replace(/(^\.?\/+)|(^\.$)|(\/\.$)/g, '')
-            : '';
-          const dirResponse = await octokit.repos.getContent({
-            owner,
-            repo,
-            path: rootPath,
-          });
-          if (!Array.isArray(dirResponse.data)) {
-            log.error(
-              `Expected github_collection repo path to be a directory`,
-              null,
-              { name, owner, repo, path: cfg.path || '.' },
+          case 'local_collection': {
+            promises.push(
+              (async () => {
+                const dirEntries = await readdir(cfg.path, {
+                  withFileTypes: true,
+                });
+                const flags = parseCollectionFlags(cfg);
+                for (const entry of dirEntries) {
+                  if (entry.isFile()) continue;
+                  if (!entry.isDirectory()) {
+                    log.warn(
+                      `Skipping non-directory entry in local_collection`,
+                      {
+                        path: `${cfg.path}/${entry.name}`,
+                      },
+                    );
+                    continue;
+                  }
+                  promises.push(
+                    loadLocalPath(`${cfg.path}/${entry.name}`, flags),
+                  );
+                }
+              })(),
             );
             break;
           }
-          for (const entry of dirResponse.data) {
-            if (entry.type !== 'dir') {
-              log.debug(`Skipping non-directory entry in github_collection`, {
-                owner,
-                repo,
-                path: entry.path,
-                type: entry.type,
-              });
-              continue;
-            }
-            await loadGitHubPath(owner, repo, entry.path);
+          case 'github': {
+            const [owner, repo] = cfg.repo.split('/');
+            promises.push(loadGitHubPath(owner, repo, cfg.path || '.'));
+            break;
           }
-          break;
+          case 'github_collection': {
+            const [owner, repo] = cfg.repo.split('/');
+            const rootPath = cfg.path
+              ? cfg.path.replace(/(^\.?\/+)|(^\.$)|(\/\.$)/g, '')
+              : '';
+            const dirResponse = await octokit.repos.getContent({
+              owner,
+              repo,
+              path: rootPath,
+            });
+            if (!Array.isArray(dirResponse.data)) {
+              log.error(
+                `Expected github_collection repo path to be a directory`,
+                null,
+                { name, owner, repo, path: cfg.path || '.' },
+              );
+              break;
+            }
+            const flags = parseCollectionFlags(cfg);
+            for (const entry of dirResponse.data) {
+              if (entry.type === 'file') continue;
+              if (entry.type !== 'dir') {
+                log.warn(`Skipping non-directory entry in github_collection`, {
+                  path: `${cfg.repo}/${entry.path}`,
+                  type: entry.type,
+                });
+                continue;
+              }
+              promises.push(loadGitHubPath(owner, repo, entry.path, flags));
+            }
+            break;
+          }
+          default: {
+            // @ts-expect-error exhaustive check
+            throw new Error(`Unhandled skill config type: ${cfg.type}`);
+          }
         }
-        default: {
-          // @ts-expect-error exhaustive check
-          throw new Error(`Unhandled skill config type: ${cfg.type}`);
-        }
+      } catch (err) {
+        log.error(`Failed to load skill config "${name}"`, err as Error);
       }
-    } catch (err) {
-      log.error(`Failed to load skill config "${name}"`, err as Error);
-    }
-  }
-  return skills;
+    }),
+  );
+  await Promise.all(promises);
+
+  // Sort skills by name
+  return new Map(
+    Array.from(skills.entries()).sort((a, b) => a[0].localeCompare(b[0])),
+  );
 };
 
 export const resolveSkill = async (
@@ -283,7 +343,7 @@ export const viewSkillContent = async (
 
   switch (skill.type) {
     case 'local': {
-      const target = path.join(skill.path, targetPath);
+      const target = Path.join(skill.path, targetPath);
       const s = await stat(target);
       if (s.isDirectory()) {
         const entries = await readdir(target, {
@@ -376,4 +436,12 @@ export const parseSkillsFlags = (
 ): SkillsFlags => ({
   enabledSkills: toSet(query?.enabled_skills),
   disabledSkills: toSet(query?.disabled_skills),
+});
+
+export const parseCollectionFlags = (
+  raw: CollectionFlagsRaw,
+): CollectionFlags => ({
+  enabledSkills: toSet(raw.enabledSkills),
+  disabledSkills: toSet(raw.disabledSkills),
+  ignoredPaths: toSet(raw.ignoredPaths),
 });

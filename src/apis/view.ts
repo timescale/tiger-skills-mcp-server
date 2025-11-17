@@ -31,7 +31,7 @@ export const view: ApiFactory<
   ServerContext,
   typeof inputSchema,
   typeof outputSchema
-> = ({ octokit, org }, { query }) => ({
+> = ({ octokit }, { query }) => ({
   name: 'view',
   method: 'get',
   route: '/view',
@@ -41,7 +41,10 @@ export const view: ApiFactory<
     inputSchema,
     outputSchema,
   },
-  fn: async ({ skill_name, path: passedPath }) => {
+  fn: async ({
+    skill_name,
+    path: passedPath,
+  }): Promise<{ content: string }> => {
     const flags = parseSkillsFlags(query);
     if (!skill_name || skill_name === '.') {
       return {

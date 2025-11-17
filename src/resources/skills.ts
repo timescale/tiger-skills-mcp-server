@@ -21,7 +21,15 @@ export const skills: ResourceFactory<ServerContext> = (
       description: skillsDescription,
     },
     uriTemplate: 'skills://{name}{?path}',
-    list: async () => {
+    list: async (): Promise<{
+      resources: Array<{
+        uri: string;
+        name: string;
+        title: string;
+        description: string;
+        mimeType: string;
+      }>;
+    }> => {
       const skills = await loadSkills(octokit);
       return {
         resources: Array.from(skills.values())
@@ -35,7 +43,10 @@ export const skills: ResourceFactory<ServerContext> = (
           })),
       };
     },
-    read: async (uri, { name, path }) => {
+    read: async (
+      uri,
+      { name, path },
+    ): Promise<{ contents: { uri: string; text: string }[] }> => {
       if (Array.isArray(name) || Array.isArray(path) || !name) {
         throw new Error('Invalid parameters');
       }

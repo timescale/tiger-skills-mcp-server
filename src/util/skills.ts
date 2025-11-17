@@ -1,7 +1,7 @@
 import { log, McpFeatureFlags, ParsedQs } from '@tigerdata/mcp-boilerplate';
 import {
   CollectionFlags,
-  CollectionFlagsRaw,
+  CollectionFlagsCfg,
   GitHubSkill,
   LocalSkill,
   Skill,
@@ -439,9 +439,9 @@ export const parseSkillsFlags = (
 });
 
 export const parseCollectionFlags = (
-  raw: CollectionFlagsRaw,
+  cfg: CollectionFlagsCfg,
 ): CollectionFlags => ({
-  enabledSkills: toSet(raw.enabledSkills),
-  disabledSkills: toSet(raw.disabledSkills),
-  ignoredPaths: toSet(raw.ignoredPaths),
+  enabledSkills: toSet(cfg.enabled_skills),
+  disabledSkills: toSet(cfg.disabled_skills),
+  ignoredPaths: toSet(cfg.ignored_paths),
 });

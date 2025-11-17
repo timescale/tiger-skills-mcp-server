@@ -94,7 +94,7 @@ Skills use a three-level loading system to manage context efficiently:
 The set of skills is configured via a YAML file. Both local directories and GitHub repositories are supported. Config can point to individual skills or collections of skills.
 
 ```yaml
-local-collection: 
+local-directory-collection: 
   # A collection of local skills stored in the `./skills` directory.
   # Each skill should be in its own subdirectory with a `SKILL.md` file.
   type: local_collection
@@ -103,24 +103,34 @@ local-individual-skill:
   # An individual local skill stored in the `./skills/skill-name` directory.
   type: local
   path: ./path-to/individual/skill-name
-claude-cookbooks:
+anthropic-github-collection:
   # A GitHub repo containing a collection of skills.
   # Each skill should be in its own subdirectory with a `SKILL.md` file.
   type: github_collection
-  repo: anthropics/claude-cookbooks
-  path: ./skills/custom_skills
-skill-creator:
+  repo: anthropics/skills
+  # path: ./ # not needed for this example since skills are at the root of the repo
+  # Optionally specify skills/paths to ignore in this collection
+  ignored_paths:
+    - .claude-plugin
+    - document-skills
+  disabled_skills:
+    - canvas-design
+  # Setting enabled_skills will _only_ load the specified skills from the collection
+  # enabled_skills:
+  #   - frontend-design
+  #   - webapp-testing
+single-github-skill-example:
   # A GitHub repo containing an individual skill.
   type: github
-  repo: anthropics/skills
-  path: skill-creator/SKILL.md
+  repo: anthropics/claude-cookbooks
+  path: ./skills/custom_skills/creating-financial-models
 ```
 
 Skill names must be unique across all configured skills. Any duplicates will be ignored with a warning.
 
 ### Connection string parameters
 
-The MCP server accepts the following connection string parameters:
+Individual clients can control the set of skills that are enabled, as well as the protocol(s) used, via parameters in the connection string.
 
 - `enabled_skills`: Comma-separated list of skill keys to enable. If not provided, all configured skills are enabled.
 - `disabled_skills`: Comma-separated list of skill keys to disable. If not provided, no skills are disabled.

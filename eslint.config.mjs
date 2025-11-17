@@ -1,5 +1,6 @@
 // @ts-check
 
+import boilerplatePlugin from '@tigerdata/mcp-boilerplate/eslintPlugin';
 import eslint from '@eslint/js';
 import { defineConfig } from 'eslint/config';
 import { dirname } from 'path';
@@ -13,6 +14,9 @@ export default defineConfig(
   tseslint.configs.recommended,
   {
     files: ['src/**/*.ts'],
+    plugins: {
+      'mcp-boilerplate': boilerplatePlugin,
+    },
     languageOptions: {
       parserOptions: {
         project: './tsconfig.json',
@@ -29,6 +33,8 @@ export default defineConfig(
       '@typescript-eslint/explicit-function-return-type': 'warn',
       '@typescript-eslint/no-inferrable-types': 'warn',
       'prefer-const': 'error',
+      // Custom rule to prevent .optional() in inputSchema
+      'mcp-boilerplate/no-optional-input-schema': 'error',
     },
   },
   {

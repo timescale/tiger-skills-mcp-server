@@ -214,9 +214,7 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
 
                 const dirPromises = dirEntries.reduce<Promise<void>[]>(
                   (acc, entry) => {
-                    if (entry.isFile()) {
-                      // skip
-                    } else if (!entry.isDirectory()) {
+                    if (!entry.isDirectory()) {
                       log.warn(
                         `Skipping non-directory entry in local_collection`,
                         {

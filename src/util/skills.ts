@@ -59,7 +59,7 @@ const parseSkillFile = async (
 };
 
 // skill name/path -> content
-let skillContentCache: Map<string, string> = new Map();
+const skillContentCache: Map<string, string> = new Map();
 
 let skillMap: Promise<Map<string, Skill>> | null = null;
 export const loadSkills = async (
@@ -119,7 +119,10 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
     return false;
   };
 
-  const loadLocalPath = async (path: string, flags?: CollectionFlags) => {
+  const loadLocalPath = async (
+    path: string,
+    flags?: CollectionFlags,
+  ): Promise<void> => {
     if (shouldIgnorePath(path, flags)) return;
     const skillPath = `${path}/SKILL.md`;
     try {
@@ -147,7 +150,7 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
     repo: string,
     path: string,
     flags?: CollectionFlags,
-  ) => {
+  ): Promise<void> => {
     if (shouldIgnorePath(path, flags)) return;
     const skillPath = `${path}/SKILL.md`;
     try {
@@ -203,7 +206,7 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
           }
           case 'local_collection': {
             promises.push(
-              (async () => {
+              (async (): Promise<void> => {
                 const dirEntries = await readdir(cfg.path, {
                   withFileTypes: true,
                 });

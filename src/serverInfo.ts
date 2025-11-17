@@ -30,7 +30,7 @@ const NUMBER_OF_RETRIES = process.env.GITHUB_REQUEST_RETRIES
 const octokit = new ThrottledOktokit({
   auth: process.env.GITHUB_TOKEN,
   throttle: {
-    onRateLimit: (retryAfterSeconds, options, _, retryCount) => {
+    onRateLimit: (retryAfterSeconds, options, _, retryCount): void | true => {
       log.warn(
         `Request quota exhausted for request ${options.method} ${options.url} (retryCount=${retryCount}), waiting ${retryAfterSeconds} seconds`,
       );
@@ -42,7 +42,7 @@ const octokit = new ThrottledOktokit({
 
       log.warn(`Request failed after ${NUMBER_OF_RETRIES} retries`);
     },
-    onSecondaryRateLimit: (retryAfterSeconds, { url, method }) => {
+    onSecondaryRateLimit: (retryAfterSeconds, { url, method }): boolean => {
       const shouldRetry =
         retryAfterSeconds <= MAX_SECONDARY_RETRY_TIMEOUT_IN_SECONDS;
 

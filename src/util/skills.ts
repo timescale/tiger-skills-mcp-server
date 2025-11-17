@@ -211,21 +211,30 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
                   withFileTypes: true,
                 });
                 const flags = parseCollectionFlags(cfg);
-                for (const entry of dirEntries) {
-                  if (entry.isFile()) continue;
-                  if (!entry.isDirectory()) {
-                    log.warn(
-                      `Skipping non-directory entry in local_collection`,
-                      {
-                        path: `${cfg.path}/${entry.name}`,
-                      },
-                    );
-                    continue;
-                  }
-                  promises.push(
-                    loadLocalPath(`${cfg.path}/${entry.name}`, flags),
-                  );
-                }
+
+                const dirPromises = dirEntries.reduce<Promise<void>[]>(
+                  (acc, entry) => {
+                    if (entry.isFile()) {
+                      // skip
+                    } else if (!entry.isDirectory()) {
+                      log.warn(
+                        `Skipping non-directory entry in local_collection`,
+                        {
+                          path: `${cfg.path}/${entry.name}`,
+                        },
+                      );
+                    } else {
+                      acc.push(
+                        loadLocalPath(`${cfg.path}/${entry.name}`, flags),
+                      );
+                    }
+
+                    return acc;
+                  },
+                  [],
+                );
+
+                await Promise.all(dirPromises);
               })(),
             );
             break;

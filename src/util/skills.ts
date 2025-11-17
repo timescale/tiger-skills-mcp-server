@@ -205,29 +205,20 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
             break;
           }
           case 'local_collection': {
-            promises.push(
-              (async (): Promise<void> => {
-                const dirEntries = await readdir(cfg.path, {
-                  withFileTypes: true,
+            const dirEntries = await readdir(cfg.path, {
+              withFileTypes: true,
+            });
+            const flags = parseCollectionFlags(cfg);
+            for (const entry of dirEntries) {
+              if (entry.isFile()) continue;
+              if (!entry.isDirectory()) {
+                log.warn(`Skipping non-directory entry in local_collection`, {
+                  path: `${cfg.path}/${entry.name}`,
                 });
-                const flags = parseCollectionFlags(cfg);
-                for (const entry of dirEntries) {
-                  if (entry.isFile()) continue;
-                  if (!entry.isDirectory()) {
-                    log.warn(
-                      `Skipping non-directory entry in local_collection`,
-                      {
-                        path: `${cfg.path}/${entry.name}`,
-                      },
-                    );
-                    continue;
-                  }
-                  promises.push(
-                    loadLocalPath(`${cfg.path}/${entry.name}`, flags),
-                  );
-                }
-              })(),
-            );
+                continue;
+              }
+              promises.push(loadLocalPath(`${cfg.path}/${entry.name}`, flags));
+            }
             break;
           }
           case 'github': {

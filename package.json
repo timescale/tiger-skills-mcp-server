@@ -28,7 +28,7 @@
   "dependencies": {
     "@octokit/plugin-throttling": "^11.0.3",
     "@octokit/rest": "^22.0.1",
-    "@tigerdata/mcp-boilerplate": "^0.6.0",
+    "@tigerdata/mcp-boilerplate": "^0.7.0",
     "@toon-format/toon": "^1.0.0",
     "dotenv": "^17.2.3",
     "gray-matter": "^4.0.3",

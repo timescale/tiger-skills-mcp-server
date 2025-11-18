@@ -1,4 +1,4 @@
-import { ApiFactory } from '@tigerdata/mcp-boilerplate';
+import { ApiFactory, InferSchema } from '@tigerdata/mcp-boilerplate';
 import { z } from 'zod';
 import { ServerContext } from '../types.js';
 import {
@@ -27,6 +27,8 @@ const outputSchema = {
   content: z.string().describe('The content of the file or directory listing.'),
 } as const;
 
+type OutputSchema = InferSchema<typeof outputSchema>;
+
 export const view: ApiFactory<
   ServerContext,
   typeof inputSchema,
@@ -41,10 +43,7 @@ export const view: ApiFactory<
     inputSchema,
     outputSchema,
   },
-  fn: async ({
-    skill_name,
-    path: passedPath,
-  }): Promise<{ content: string }> => {
+  fn: async ({ skill_name, path: passedPath }): Promise<OutputSchema> => {
     const flags = parseSkillsFlags(query);
     if (!skill_name || skill_name === '.') {
       return {

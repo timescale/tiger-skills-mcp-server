@@ -21,6 +21,8 @@
     "start:stdio": "node dist/index.js stdio",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
+    "prettier:check": "prettier --check .",
+    "prettier:write": "prettier --write .",
     "inspector": "npx @modelcontextprotocol/inspector"
   },
   "dependencies": {

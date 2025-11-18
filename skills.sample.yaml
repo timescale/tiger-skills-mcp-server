@@ -1,6 +1,6 @@
 ---
 # Copy this file to `skills.yaml` and customize as needed.
-local-collection: 
+local-collection:
   # A collection of local skills stored in the `./skills` directory.
   # Each skill should be in its own subdirectory with a `SKILL.md` file.
   type: local_collection

@@ -83,9 +83,9 @@ Skills use a three-level loading system to manage context efficiently:
 
 1. **Metadata (name + description)** - Always in context (~100 words)
 2. **SKILL.md body** - When skill triggers (<5k words)
-3. **Bundled resources** - As needed by the agent (Unlimited*)
+3. **Bundled resources** - As needed by the agent (Unlimited\*)
 
-*Unlimited because scripts can be executed without reading into context window.
+\*Unlimited because scripts can be executed without reading into context window.
 
 </details>
 
@@ -94,7 +94,7 @@ Skills use a three-level loading system to manage context efficiently:
 The set of skills is configured via a YAML file. Both local directories and GitHub repositories are supported. Config can point to individual skills or collections of skills.
 
 ```yaml
-local-directory-collection: 
+local-directory-collection:
   # A collection of local skills stored in the `./skills` directory.
   # Each skill should be in its own subdirectory with a `SKILL.md` file.
   type: local_collection
@@ -205,7 +205,10 @@ Create/edit the file `~/Library/Application Support/Claude/claude_desktop_config
   "mcpServers": {
     "tiger-skills": {
       "command": "node",
-      "args": ["/absolute/path/to/tiger-skills-mcp-server/dist/index.js", "stdio"],
+      "args": [
+        "/absolute/path/to/tiger-skills-mcp-server/dist/index.js",
+        "stdio"
+      ],
       "env": {
         "GITHUB_TOKEN": "ghp_whatever",
         "GITHUB_ORG": "timescale"

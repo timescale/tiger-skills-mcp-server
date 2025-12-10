@@ -121,4 +121,4 @@ jobs:
               - type: "markdown"
                 text: |
                   **tiger-skills-mcp-server ${{ github.ref_name }} published**
-                  [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) | [npm](https://www.npmjs.com/package/@tigerdata/tiger-skills-mcp-server/v/${{ steps.version.outputs.number }}) | [mcp registry](https://registry.modelcontextprotocol.io/?q=tiger-skills-mcp-server) | [ghcr.io](https://ghcr.io/timescale/tiger-skills-mcp-server) | [docker.io](https://hub.docker.com/r/timescale/tiger-skills-mcp-server)
+                  [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) | [npm](https://www.npmjs.com/package/@tigerdata/tiger-skills-mcp-server/v/${{ steps.version.outputs.number }}) | [mcp registry](https://registry.modelcontextprotocol.io/?q=tiger-skills) | [ghcr.io](https://ghcr.io/timescale/tiger-skills-mcp-server) | [docker.io](https://hub.docker.com/r/timescale/tiger-skills-mcp-server)

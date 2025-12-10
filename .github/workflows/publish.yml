@@ -90,7 +90,7 @@ jobs:
         run: ./mcp-publisher login github-oidc
       - name: Set version in server.json
         run: |
-          ./bun ./generate-server.json.ts ${{ github.ref_name }}
+          ./bun ./util/generate-server.json.ts ${{ github.ref_name }}
       - name: Publish server to MCP Registry
         run: ./mcp-publisher publish
 

@@ -10,6 +10,8 @@ RUN --mount=type=cache,target=/root/.npm npm install
 
 FROM node:22-alpine AS release
 
+LABEL io.modelcontextprotocol.server.name="io.github.timescale/tiger-skills"
+
 WORKDIR /app
 
 COPY --from=builder /app/dist /app/dist

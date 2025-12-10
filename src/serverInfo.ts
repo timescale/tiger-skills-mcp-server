@@ -13,15 +13,6 @@ const MAX_SECONDARY_RETRY_TIMEOUT_IN_SECONDS = process.env
   ? parseInt(process.env.MAX_SECONDARY_RETRY_TIMEOUT_IN_SECONDS)
   : 5;
 
-const org = process.env.GITHUB_ORG;
-if (!org) {
-  throw new Error('GITHUB_ORG environment variable is required.');
-}
-
-if (!process.env.GITHUB_TOKEN) {
-  throw new Error('GITHUB_TOKEN environment variable is required.');
-}
-
 const ThrottledOktokit = Octokit.plugin(throttling);
 const NUMBER_OF_RETRIES = process.env.GITHUB_REQUEST_RETRIES
   ? parseInt(process.env.GITHUB_REQUEST_RETRIES)
@@ -58,4 +49,4 @@ const octokit = new ThrottledOktokit({
   },
 });
 
-export const context: ServerContext = { octokit, org };
+export const context: ServerContext = { octokit };

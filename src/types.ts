@@ -82,7 +82,6 @@ export type SkillMap = z.infer<typeof zSkillMap>;
 
 export interface ServerContext extends Record<string, unknown> {
   octokit: Octokit;
-  org: string;
 }
 
 export interface SkillsFlags {

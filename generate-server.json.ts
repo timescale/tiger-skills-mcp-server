@@ -49,7 +49,7 @@ const output = {
       registryType: 'oci',
       identifier: `ghcr.io/timescale/tiger-skills-mcp-server:${version}`,
       transport: {
-        type: 'streamable-http',
+        type: 'stdio',
       },
       environmentVariables,
     },

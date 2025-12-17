@@ -153,7 +153,7 @@ git clone git@github.com:timescale/tiger-skills-mcp-server.git
 
 ### Building
 
-Run `npm i` to install dependencies and build the project. Use `npm run watch` to rebuild on changes.
+Run `./bun i` to install dependencies and build the project. Use `./bun watch` to rebuild on changes.
 
 You will need a GitHub token with the correct scopes. Here is a direct link to [create such a new token](https://github.com/settings/tokens/new?scopes=repo,read:org,read:user,user:email&description=tiger-skills-mcp-server).
 
@@ -170,13 +170,13 @@ Then update the `GITHUB_TOKEN` value in `.env`.
 The MCP Inspector is a very handy to exercise the MCP server from a web-based UI.
 
 ```bash
-npm run inspector
+./bun inspector
 ```
 
 #### Test via HTTP
 
 ```bash
-npm run watch
+./bun watch http
 ```
 
 | Field          | Value                       |
@@ -187,7 +187,7 @@ npm run watch
 #### Test via stdio
 
 ```bash
-npm run watch:stdio
+./bun watch stdio
 ```
 
 | Field          | Value           |

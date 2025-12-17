@@ -1,7 +1,7 @@
 import { throttling } from '@octokit/plugin-throttling';
 import { Octokit } from '@octokit/rest';
 import { log } from '@tigerdata/mcp-boilerplate';
-import { ServerContext } from './types.js';
+import type { ServerContext } from './types.js';
 
 export const serverInfo = {
   name: 'tiger-skills',
@@ -10,18 +10,23 @@ export const serverInfo = {
 
 const MAX_SECONDARY_RETRY_TIMEOUT_IN_SECONDS = process.env
   .MAX_SECONDARY_RETRY_TIMEOUT_IN_SECONDS
-  ? parseInt(process.env.MAX_SECONDARY_RETRY_TIMEOUT_IN_SECONDS)
+  ? parseInt(process.env.MAX_SECONDARY_RETRY_TIMEOUT_IN_SECONDS, 10)
   : 5;
 
 const ThrottledOktokit = Octokit.plugin(throttling);
 const NUMBER_OF_RETRIES = process.env.GITHUB_REQUEST_RETRIES
-  ? parseInt(process.env.GITHUB_REQUEST_RETRIES)
+  ? parseInt(process.env.GITHUB_REQUEST_RETRIES, 10)
   : 2;
 
 const octokit = new ThrottledOktokit({
   auth: process.env.GITHUB_TOKEN,
   throttle: {
-    onRateLimit: (retryAfterSeconds, options, _, retryCount): void | true => {
+    onRateLimit: (
+      retryAfterSeconds,
+      options,
+      _,
+      retryCount,
+    ): undefined | true => {
       log.warn(
         `Request quota exhausted for request ${options.method} ${options.url} (retryCount=${retryCount}), waiting ${retryAfterSeconds} seconds`,
       );

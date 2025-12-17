@@ -1,5 +1,5 @@
-import { ResourceFactory } from '@tigerdata/mcp-boilerplate';
-import { ServerContext } from '../types.js';
+import type { ResourceFactory } from '@tigerdata/mcp-boilerplate';
+import type { ServerContext } from '../types.js';
 import {
   loadSkills,
   parseSkillsFlags,

@@ -22,12 +22,12 @@
   ],
   "scripts": {
     "build": "tsc && shx chmod +x dist/*.js",
-    "prepublishOnly": "bun run build",
-    "watch": "bun --watch src/index.ts",
-    "start": "bun src/index.ts",
+    "prepublishOnly": "./bun run build",
+    "watch": "./bun --watch src/index.ts",
+    "start": "./bun src/index.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "bun x @biomejs/biome check",
-    "inspector": "bun x @modelcontextprotocol/inspector"
+    "lint": "./bun x @biomejs/biome check",
+    "inspector": "./bun x @modelcontextprotocol/inspector"
   },
   "dependencies": {
     "@octokit/plugin-throttling": "^11.0.3",

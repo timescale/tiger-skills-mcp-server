@@ -1,22 +1,26 @@
-import { log, McpFeatureFlags, ParsedQs } from '@tigerdata/mcp-boilerplate';
+import { readdir, readFile, stat } from 'node:fs/promises';
+import Path from 'node:path';
+import type { Octokit } from '@octokit/rest';
 import {
-  CollectionFlags,
-  CollectionFlagsCfg,
-  GitHubSkill,
-  LocalSkill,
-  Skill,
-  SkillCfgMap,
-  SkillMatter,
-  SkillsFlags,
+  log,
+  type McpFeatureFlags,
+  type ParsedQs,
+} from '@tigerdata/mcp-boilerplate';
+import { encode } from '@toon-format/toon';
+import matter from 'gray-matter';
+import YAML from 'yaml';
+import {
+  type CollectionFlags,
+  type CollectionFlagsCfg,
+  type GitHubSkill,
+  type LocalSkill,
+  type Skill,
+  type SkillCfgMap,
+  type SkillMatter,
+  type SkillsFlags,
   zSkillCfgMap,
   zSkillMatter,
 } from '../types.js';
-import { readdir, readFile, stat } from 'fs/promises';
-import matter from 'gray-matter';
-import YAML from 'yaml';
-import { Octokit } from '@octokit/rest';
-import { encode } from '@toon-format/toon';
-import Path from 'path';
 
 let skillCfgMap: SkillCfgMap | null = null;
 export const getSkillConfig = async (): Promise<SkillCfgMap> => {
@@ -97,7 +101,7 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
   };
 
   const shouldIgnorePath = (path: string, flags?: CollectionFlags): boolean => {
-    if (flags?.ignoredPaths && flags.ignoredPaths.has(path)) {
+    if (flags?.ignoredPaths?.has(path)) {
       log.debug(`Ignoring path "${path}" in ignoredPaths`);
       return true;
     }
@@ -112,7 +116,7 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
       log.debug(`Ignoring skill "${name}" not in enabledSkills`);
       return true;
     }
-    if (flags?.disabledSkills && flags.disabledSkills.has(name)) {
+    if (flags?.disabledSkills?.has(name)) {
       log.debug(`Ignoring skill "${name}" in disabledSkills`);
       return true;
     }
@@ -223,11 +227,27 @@ const doLoadSkills = async (octokit: Octokit): Promise<Map<string, Skill>> => {
           }
           case 'github': {
             const [owner, repo] = cfg.repo.split('/');
+            if (!owner || !repo) {
+              log.error(
+                `Invalid GitHub repo format in skill config: ${cfg.repo}`,
+                null,
+                { name, repo: cfg.repo },
+              );
+              break;
+            }
             promises.push(loadGitHubPath(owner, repo, cfg.path || '.'));
             break;
           }
           case 'github_collection': {
             const [owner, repo] = cfg.repo.split('/');
+            if (!owner || !repo) {
+              log.error(
+                `Invalid GitHub repo format in skill config: ${cfg.repo}`,
+                null,
+                { name, repo: cfg.repo },
+              );
+              break;
+            }
             const rootPath = cfg.path
               ? cfg.path.replace(/(^\.?\/+)|(^\.$)|(\/\.$)/g, '')
               : '';
@@ -293,7 +313,7 @@ export const skillVisible = (name: string, flags: SkillsFlags): boolean => {
   if (flags.enabledSkills && !flags.enabledSkills.has(name)) {
     return false;
   }
-  if (flags.disabledSkills && flags.disabledSkills.has(name)) {
+  if (flags.disabledSkills?.has(name)) {
     return false;
   }
   return true;
@@ -356,6 +376,9 @@ export const viewSkillContent = async (
     }
     case 'github': {
       const [owner, repo] = skill.repo.split('/');
+      if (!owner || !repo) {
+        throw new Error(`Invalid GitHub repo format in skill: ${skill.repo}`);
+      }
       const target = `${skill.path || '.'}/${targetPath}`
         .replace(/\/+/g, '/')
         .replace(/(^\.?\/+)|(^\.$)|(\/\.$)/g, '');

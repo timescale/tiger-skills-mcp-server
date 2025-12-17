@@ -1,5 +1,6 @@
-dist
-node_modules
+dist/
+download/
+node_modules/
 .env
 .DS_Store
 skills.yaml

@@ -9,6 +9,7 @@ import {
 import { encode } from '@toon-format/toon';
 import matter from 'gray-matter';
 import YAML from 'yaml';
+import { z } from 'zod';
 import {
   type CollectionFlags,
   type CollectionFlagsCfg,
@@ -22,15 +23,21 @@ import {
   zSkillMatter,
 } from '../types.js';
 
+const TTL = process.env.SKILLS_TTL
+  ? parseInt(process.env.SKILLS_TTL, 10)
+  : 5 * 60 * 1000;
+
+let lastFetch = 0;
 let skillCfgMap: SkillCfgMap | null = null;
 export const getSkillConfig = async (): Promise<SkillCfgMap> => {
-  if (skillCfgMap) return skillCfgMap;
+  if (skillCfgMap && Date.now() - lastFetch < TTL) return skillCfgMap;
 
   const data = await readFile(
     process.env.SKILLS_FILE || './skills.yaml',
     'utf-8',
   );
   skillCfgMap = zSkillCfgMap.parse(YAML.parse(data));
+  lastFetch = Date.now();
 
   return skillCfgMap;
 };
@@ -438,6 +445,21 @@ Each skill contains:
 - Skills may also refer to tools or resources external to the skill itself
 - Use other tools to execute any code or scripts provided by the skill
 `.trim();
+
+export const skillsInputSchema = {
+  skill_name: z
+    .string()
+    .describe(
+      'The name of the skill to browse, or `.` to list all available skills.',
+    ),
+  path: z.string().describe(
+    `
+A relative path to a file or directory within the skill to view.
+If empty, will view the \`SKILL.md\` file by default.
+Use \`.\` to list the root directory of the skill.
+`.trim(),
+  ),
+} as const;
 
 const toSet = (flag: ParsedQs[string]): Set<string> | null =>
   flag

@@ -4,4 +4,5 @@ node_modules/
 .env
 .DS_Store
 skills.yaml
+mcp.yaml
 .claude/*.local.json

@@ -210,8 +210,7 @@ Create/edit the file `~/Library/Application Support/Claude/claude_desktop_config
         "stdio"
       ],
       "env": {
-        "GITHUB_TOKEN": "ghp_whatever",
-        "GITHUB_ORG": "timescale"
+        "GITHUB_TOKEN": "ghp_whatever"
       }
     }
   }

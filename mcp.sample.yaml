@@ -1,0 +1,4 @@
+---
+pg_aiguide:
+  type: http
+  url: https://mcp.tigerdata.com/docs

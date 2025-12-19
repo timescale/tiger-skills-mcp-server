@@ -1,7 +1,12 @@
 import type { ApiFactory, InferSchema } from '@tigerdata/mcp-boilerplate';
 import { z } from 'zod';
 import type { ServerContext } from '../types.js';
-import { executeSubagent, subagentInputSchema } from '../util/subagent.js';
+import {
+  executeSubagent,
+  subagentInputSchema,
+  subagentToolDescription,
+  subagentToolTitle,
+} from '../util/subagent.js';
 
 const outputSchema = {
   response: z.string().describe('The result of the subagent task.'),
@@ -15,12 +20,12 @@ export const subagent: ApiFactory<
   typeof outputSchema
 > = (ctx, flags) => ({
   name: 'subagent',
-  disabled: process.env.SUBAGENT_DISABLED === 'true',
+  disabled: ['true', '1'].includes(process.env.SUBAGENT_DISABLED || ''),
   method: 'get',
   route: '/subagent',
   config: {
-    title: 'Execute subagent task',
-    description: 'Invoke an agent work on a task.',
+    title: subagentToolTitle,
+    description: subagentToolDescription,
     inputSchema: subagentInputSchema,
     outputSchema,
   },

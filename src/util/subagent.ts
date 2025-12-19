@@ -20,13 +20,17 @@ const models: Record<TaskComplexity, LanguageModel> = {
 };
 
 export const subagentInputSchema = {
-  prompt: z
-    .string()
-    .describe(
-      'The prompt to give to the subagent. This should be a clear and concise description of the task to be completed. Include any necessary context or instructions to ensure the subagent can complete the task effectively.',
-    ),
+  prompt: z.string().describe('A description of the task to be completed.'),
   complexity: zTaskComplexity,
 } as const;
+
+export const subagentToolTitle = 'Execute subagent task';
+
+export const subagentToolDescription = `
+Invoke an agent to work on a task.
+
+Provide a clear and concise description of the task to be completed, including any necessary context or instructions to ensure the agent can complete the task effectively.
+`.trim();
 
 export const executeSubagent = async (
   prompt: string,
@@ -49,9 +53,9 @@ export const executeSubagent = async (
         execute: skillsTool.fn,
       }),
       subagent: tool({
-        description: 'Invoke an agent work on a task.',
+        description: subagentToolDescription,
         inputSchema: z.object(subagentInputSchema),
-        title: 'Execute subagent task',
+        title: subagentToolTitle,
         execute: async ({ prompt, complexity }) => ({
           content: await executeSubagent(prompt, complexity, ctx, flags),
         }),

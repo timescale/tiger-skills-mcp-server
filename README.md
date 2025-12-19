@@ -143,6 +143,26 @@ Individual clients can control the set of skills that are enabled, as well as th
 http://tiger-skills-mcp-server/mcp?disabled_skills=foo,bar&resources=0
 ```
 
+## Subagent Task Execution
+
+This MCP server (optionally) provides a `subagent` tool that can be used to break up complex tasks into smaller subtasks, each handled by its own agent instance. This is useful for tasks that require multiple steps, especially when those steps may require consuming large amounts of data in LLM context.
+
+The subagent will automatically have access to the same set of skills as configured for the `view` skill tool, as well as the ability to (recursively) invoke further subagents. In addition, a `mcp.yaml` configuration file can be provided to specify additional tooling to be made available to the subagent.
+
+If you do not wish to use subagents, you can set `SUBAGENT_DISABLED=true` in the environment to disable the tool.
+
+### MCP Configuration for Subagents
+
+Create a `mcp.yaml` file to specify additional tools for the subagent to have accessible. This file is read from the root directory by default, or you can specify a different path via the `MCP_PATH` environment variable.
+
+Only the streamable HTTP transport is supported at this time.
+
+```yaml
+pg_aiguide:
+  type: http
+  url: https://mcp.tigerdata.com/docs
+```
+
 ## Development
 
 Cloning and running the server locally.

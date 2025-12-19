@@ -10,7 +10,7 @@
         "@ai-sdk/openai": "^3.0.0-beta.104",
         "@octokit/plugin-throttling": "^11.0.3",
         "@octokit/rest": "^22.0.1",
-        "@tigerdata/mcp-boilerplate": "^0.9.2",
+        "@tigerdata/mcp-boilerplate": "^0.9.3",
         "@toon-format/toon": "^2.1.0",
         "ai": "^6.0.0-beta.159",
         "dotenv": "^17.2.3",
@@ -655,7 +655,7 @@
 
     "@tailwindcss/vite": ["@tailwindcss/vite@4.1.18", "", { "dependencies": { "@tailwindcss/node": "4.1.18", "@tailwindcss/oxide": "4.1.18", "tailwindcss": "4.1.18" }, "peerDependencies": { "vite": "^5.2.0 || ^6 || ^7" } }, "sha512-jVA+/UpKL1vRLg6Hkao5jldawNmRo7mQYrZtNHMIVpLfLhDml5nMRUo/8MwoX2vNXvnaXNNMedrMfMugAVX1nA=="],
 
-    "@tigerdata/mcp-boilerplate": ["@tigerdata/mcp-boilerplate@0.9.2", "", { "dependencies": { "@mcp-use/inspector": "^0.13.2", "@modelcontextprotocol/sdk": "^1.25.1", "@opentelemetry/api": "^1.9.0", "@opentelemetry/auto-instrumentations-node": "^0.67.3", "@opentelemetry/exporter-trace-otlp-grpc": "^0.208.0", "@opentelemetry/instrumentation-http": "^0.208.0", "@opentelemetry/sdk-metrics": "^2.2.0", "@opentelemetry/sdk-node": "^0.208.0", "@opentelemetry/sdk-trace-node": "^2.2.0", "@opentelemetry/semantic-conventions": "^1.38.0", "express": "^5.2.1", "raw-body": "^3.0.2", "zod": "^3.23.8" } }, "sha512-i3f81U39v1ne9NJrHcpwE/oehumH4lLCtOVeJoZBvK2AJHhHb7ETrx+sAg2dTmV+eCN04f4kubzAth1Oeg+74g=="],
+    "@tigerdata/mcp-boilerplate": ["@tigerdata/mcp-boilerplate@0.9.3", "", { "dependencies": { "@mcp-use/inspector": "^0.13.2", "@modelcontextprotocol/sdk": "^1.25.1", "@opentelemetry/api": "^1.9.0", "@opentelemetry/auto-instrumentations-node": "^0.67.3", "@opentelemetry/exporter-trace-otlp-grpc": "^0.208.0", "@opentelemetry/instrumentation-http": "^0.208.0", "@opentelemetry/sdk-metrics": "^2.2.0", "@opentelemetry/sdk-node": "^0.208.0", "@opentelemetry/sdk-trace-node": "^2.2.0", "@opentelemetry/semantic-conventions": "^1.38.0", "express": "^5.2.1", "raw-body": "^3.0.2", "zod": "^3.23.8" } }, "sha512-PqTFUrqh3w4xd+K6HugVonq36NoIdhEoG4cWIKQwX/vaI84qMNgWD/DeZRsqG5IRYHolS9HY1i3rJnT1RPyjNw=="],
 
     "@toon-format/toon": ["@toon-format/toon@2.1.0", "", {}, "sha512-JwWptdF5eOA0HaQxbKAzkpQtR4wSWTEfDlEy/y3/4okmOAX1qwnpLZMmtEWr+ncAhTTY1raCKH0kteHhSXnQqg=="],
 

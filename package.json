@@ -35,7 +35,7 @@
     "@ai-sdk/openai": "^3.0.0-beta.104",
     "@octokit/plugin-throttling": "^11.0.3",
     "@octokit/rest": "^22.0.1",
-    "@tigerdata/mcp-boilerplate": "^0.8.0",
+    "@tigerdata/mcp-boilerplate": "^0.9.2",
     "@toon-format/toon": "^2.1.0",
     "ai": "^6.0.0-beta.159",
     "dotenv": "^17.2.3",

@@ -2,7 +2,7 @@
 
 ## Build, Test & Run Commands
 
-- Build: `./bun build` - Compiles TypeScript to JavaScript
+- Build: `./bun run build` - Compiles TypeScript to JavaScript
 - Watch mode: `./bun watch` - Watches for changes and rebuilds automatically
 - Run server: `./bun start` - Starts the MCP server using stdio transport
 

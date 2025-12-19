@@ -5,23 +5,9 @@ import {
   listSkills,
   parseSkillsFlags,
   skillsDescription,
+  skillsInputSchema,
   viewSkillContent,
 } from '../util/skills.js';
-
-const inputSchema = {
-  skill_name: z
-    .string()
-    .describe(
-      'The name of the skill to browse, or `.` to list all available skills.',
-    ),
-  path: z.string().describe(
-    `
-A relative path to a file or directory within the skill to view.
-If empty, will view the \`SKILL.md\` file by default.
-Use \`.\` to list the root directory of the skill.
-`.trim(),
-  ),
-} as const;
 
 const outputSchema = {
   content: z.string().describe('The content of the file or directory listing.'),
@@ -31,7 +17,7 @@ type OutputSchema = InferSchema<typeof outputSchema>;
 
 export const view: ApiFactory<
   ServerContext,
-  typeof inputSchema,
+  typeof skillsInputSchema,
   typeof outputSchema
 > = ({ octokit }, { query }) => ({
   name: 'view',
@@ -40,7 +26,7 @@ export const view: ApiFactory<
   config: {
     title: 'View Skill',
     description: skillsDescription,
-    inputSchema,
+    inputSchema: skillsInputSchema,
     outputSchema,
   },
   fn: async ({ skill_name, path: passedPath }): Promise<OutputSchema> => {

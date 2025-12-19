@@ -88,3 +88,6 @@ export interface SkillsFlags {
   enabledSkills: Set<string> | null;
   disabledSkills: Set<string> | null;
 }
+
+export const zTaskComplexity = z.enum(['low', 'medium', 'high']);
+export type TaskComplexity = z.infer<typeof zTaskComplexity>;

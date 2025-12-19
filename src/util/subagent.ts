@@ -3,7 +3,11 @@ import { log, type McpFeatureFlags } from '@tigerdata/mcp-boilerplate';
 import { type LanguageModel, ToolLoopAgent, type ToolSet, tool } from 'ai';
 import z from 'zod';
 import { view } from '../apis/view';
-import type { ServerContext, TaskComplexity } from '../types';
+import {
+  type ServerContext,
+  type TaskComplexity,
+  zTaskComplexity,
+} from '../types';
 import { getMCPConfig } from './mcp';
 import { parseModel } from './models';
 
@@ -14,6 +18,15 @@ const models: Record<TaskComplexity, LanguageModel> = {
   ),
   high: parseModel(process.env.HIGH_TASK_MODEL || 'anthropic/claude-opus-4-5'),
 };
+
+export const subagentInputSchema = {
+  prompt: z
+    .string()
+    .describe(
+      'The prompt to give to the subagent. This should be a clear and concise description of the task to be completed. Include any necessary context or instructions to ensure the subagent can complete the task effectively.',
+    ),
+  complexity: zTaskComplexity,
+} as const;
 
 export const executeSubagent = async (
   prompt: string,
@@ -35,6 +48,14 @@ export const executeSubagent = async (
         title: skillsTool.config.title,
         execute: skillsTool.fn,
       }),
+      subagent: tool({
+        description: 'Invoke an agent work on a task.',
+        inputSchema: z.object(subagentInputSchema),
+        title: 'Execute subagent task',
+        execute: async ({ prompt, complexity }) => ({
+          content: await executeSubagent(prompt, complexity, ctx, flags),
+        }),
+      }),
     };
     const mcpCfg = await getMCPConfig();
     for (const [mcpName, cfg] of Object.entries(mcpCfg)) {
@@ -54,7 +75,7 @@ export const executeSubagent = async (
       model: models[complexity],
 
       instructions: `
-You are a subagent, assigned to complete a task. Use the tools and skills provided to you to complete the task as accurately and efficiently as possible.
+You are a subagent, assigned to complete a task. Use the tools and skills provided to complete the task as accurately and efficiently as possible.
 
 If the task requires multiple steps, break it down into smaller subtasks and hand these off to a subagent. You will then act as an
 orchestrator, synthesizing the results of the subagents' work to complete the high-level task.

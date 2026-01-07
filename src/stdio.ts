@@ -4,7 +4,7 @@ import { apiFactories } from './apis/index.js';
 import { resourceFactories } from './resources/index.js';
 import { context, serverInfo } from './serverInfo.js';
 
-stdioServerFactory({
+await stdioServerFactory({
   ...serverInfo,
   context,
   apiFactories,

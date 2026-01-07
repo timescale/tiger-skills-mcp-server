@@ -91,6 +91,13 @@ Skills use a three-level loading system to manage context efficiently:
 
 ## Configuration
 
+### Environment Variables
+
+- `SKILLS_FILE`: Path to the YAML file configuring the set of skills. Default: `./skills.yaml`
+- `SKILLS_TTL`: Time (in milliseconds) to cache loaded skills. Default: 5 minutes
+
+### Skills Configuration File
+
 The set of skills is configured via a YAML file. Both local directories and GitHub repositories are supported. Config can point to individual skills or collections of skills.
 
 ```yaml

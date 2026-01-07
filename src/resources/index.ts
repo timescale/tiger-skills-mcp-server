@@ -1,3 +1,3 @@
-import { skills } from './skills.js';
+import { createSkillsResourceFactory } from '@tigerdata/mcp-boilerplate/skills';
 
-export const resourceFactories = [skills] as const;
+export const resourceFactories = [createSkillsResourceFactory()] as const;

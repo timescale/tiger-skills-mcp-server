@@ -4,7 +4,7 @@ import { apiFactories } from './apis/index.js';
 import { resourceFactories } from './resources/index.js';
 import { context, serverInfo } from './serverInfo.js';
 
-export const { registerCleanupFn } = httpServerFactory({
+export const { registerCleanupFn } = await httpServerFactory({
   ...serverInfo,
   context,
   apiFactories,

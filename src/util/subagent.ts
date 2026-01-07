@@ -2,7 +2,7 @@ import { experimental_createMCPClient as createMCPClient } from '@ai-sdk/mcp';
 import { log, type McpFeatureFlags } from '@tigerdata/mcp-boilerplate';
 import { type LanguageModel, ToolLoopAgent, type ToolSet, tool } from 'ai';
 import z from 'zod';
-import { view } from '../apis/view';
+import { viewFactory } from '../apis';
 import {
   type ServerContext,
   type TaskComplexity,
@@ -44,7 +44,7 @@ export const executeSubagent = async (
   };
 
   try {
-    const skillsTool = view(ctx, flags);
+    const skillsTool = await viewFactory(ctx, flags);
     const tools: ToolSet = {
       skills_view: tool({
         description: skillsTool.config.description,

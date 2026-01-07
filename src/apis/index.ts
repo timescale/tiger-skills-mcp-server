@@ -1,4 +1,8 @@
+import { createViewSkillToolFactory } from '@tigerdata/mcp-boilerplate/skills';
 import { subagent } from './subagent.js';
-import { view } from './view.js';
 
-export const apiFactories = [view, subagent] as const;
+export const viewFactory = createViewSkillToolFactory({
+  appendSkillsListToDescription: true,
+});
+
+export const apiFactories = [viewFactory, subagent] as const;

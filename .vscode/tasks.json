@@ -1,0 +1,51 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "command": "bun install",
+      "group": "build",
+      "label": "Tiger-Skills MCP - bun: install",
+      "detail": "Install Tiger-Skills MCP server dependencies",
+      "options": {
+        "cwd": "${workspaceFolder}/src"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    },
+    {
+      "type": "shell",
+      "command": "bun run build",
+      "group": "build",
+      "label": "Tiger-Skills MCP - bun: build",
+      "detail": "Build the Tiger-Skills MCP server",
+      "dependsOn": "Tiger-Skills MCP - bun: install",
+      "options": {
+        "cwd": "${workspaceFolder}/src"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    },
+    {
+      "label": "Tiger-Skills MCP - Build Only",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Tiger-Skills MCP - bun: install",
+        "Tiger-Skills MCP - bun: build"
+      ],
+      "group": "build"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Tiger Skills MCP Server",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/dist/index.js",
+            "args": [
+                "http"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "cwd": "${workspaceFolder}/../tiger-skills-mcp-server",
+            "env": {
+                "NODE_ENV": "development",
+                "SKILLS_FILE": "./skills.yaml",
+                "PORT": "5570"
+            },
+            "envFile": "${workspaceFolder}/.env",
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        }
+    ]
+}

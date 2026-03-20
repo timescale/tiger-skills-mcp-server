@@ -15,6 +15,7 @@
             "env": {
                 "NODE_ENV": "development",
                 "SKILLS_FILE": "./skills.yaml",
+                "PORT": "5570"
             },
             "envFile": "${workspaceFolder}/.env",
             "sourceMaps": true,
